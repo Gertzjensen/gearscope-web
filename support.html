@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support — Gearscope</title>
+<meta name="description" content="Gearscope support. Get help with shutter count readings, supported cameras, SD-card tests and more.">
+<style>
+  :root { --bg:#0f1117; --card:#1a1d27; --border:#282c38; --text:#e9ebf2; --dim:#9aa0b0; --accent2:#5b9cf5; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--text); font:16px/1.65 system-ui,-apple-system,sans-serif; padding:48px 20px 64px; }
+  .wrap { max-width:680px; margin:0 auto; }
+  a { color:var(--accent2); } a:hover { text-decoration:underline; }
+  .home { font-size:14px; color:var(--dim); }
+  h1 { font-size:30px; font-weight:800; margin:14px 0 4px; }
+  .lead { color:var(--dim); font-size:16px; margin-bottom:24px; }
+  .contact { background:var(--card); border:1px solid var(--border); border-radius:12px;
+             padding:20px 22px; margin:22px 0; }
+  .contact a { font-size:19px; font-weight:700; }
+  h2 { font-size:19px; margin:30px 0 10px; }
+  details { background:var(--card); border:1px solid var(--border); border-radius:10px;
+            padding:14px 16px; margin:10px 0; }
+  summary { cursor:pointer; font-weight:600; }
+  details p { color:#d3d7e3; margin-top:8px; }
+  footer { border-top:1px solid var(--border); margin-top:40px; padding-top:20px; color:var(--dim); font-size:14px; }
+</style></head><body><div class="wrap">
+  <a class="home" href="index.html">← Gearscope</a>
+  <h1>Support</h1>
+  <p class="lead">Happy to help. Most questions are answered below — otherwise just email me.</p>
+
+  <div class="contact">
+    Email support: <a href="mailto:jonas@gertz-el.dk">jonas@gertz-el.dk</a><br>
+    <span style="color:var(--dim);font-size:14px">I read every message and usually reply within a couple of days.</span>
+  </div>
+
+  <h2>Frequently asked</h2>
+
+  <details><summary>Which cameras can read shutter count?</summary>
+    <p>Nikon (2005 onward), Sony E-mount, Fujifilm X/GFX, Pentax, and Canon's R5/R6/R8 generation
+    embed the shutter count in their files, so Gearscope reads it directly. Many older Canon models
+    (RP, 5D series, M50…) do not store the counter in photos — that's Canon's design, not a fault —
+    and Olympus/Panasonic never embed it. Gearscope always tells you honestly when a value isn't available.</p></details>
+
+  <details><summary>The reading says "no shutter count" — why?</summary>
+    <p>Either the camera model doesn't embed the counter (see above), or the file was edited or
+    re-exported and lost its original metadata. Always use an original, unedited file straight
+    from the camera or card.</p></details>
+
+  <details><summary>Is my data safe?</summary>
+    <p>Yes. Everything runs on your own device — nothing is uploaded. See the
+    <a href="privacy.html">privacy policy</a> for details.</p></details>
+
+  <details><summary>Does the free web check do everything the app does?</summary>
+    <p>The web check reads shutter count and gear info from a photo. The full Mac app adds SD-card
+    speed and authenticity tests, a sensor-dust check, wear history, firmware checks, PDF/CSV reports
+    and USB readout directly from a connected camera.</p></details>
+
+  <details><summary>How do I report a camera that isn't supported yet?</summary>
+    <p>Email me the camera model and, if possible, one unedited sample photo. Adding new models is
+    exactly how Gearscope improves.</p></details>
+
+  <footer>© 2026 Jonas Gertz · <a href="index.html">Gearscope</a> · <a href="privacy.html">Privacy</a></footer>
+</div></body></html>

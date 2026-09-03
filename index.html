@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gearscope — instant shutter count &amp; gear check for your camera</title>
+<meta name="description" content="Read your camera's shutter count, serial number, lens and gear history straight from a photo file. Free in your browser — nothing is uploaded. Canon, Nikon, Sony, Fujifilm, Pentax.">
+<style>
+  :root { --bg:#0f1117; --card:#1a1d27; --border:#282c38; --text:#e9ebf2; --dim:#9aa0b0;
+          --accent:#3f6fd8; --accent2:#5b9cf5; --good:#7bd88f; --warn:#e0b060; }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--text); font:16px/1.6 system-ui,-apple-system,sans-serif; }
+  a { color:var(--accent2); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .wrap { max-width:820px; margin:0 auto; padding:0 20px; }
+  /* Hero */
+  header.hero { text-align:center; padding:64px 20px 32px; }
+  .logo { font-size:44px; }
+  h1 { font-size:40px; font-weight:800; letter-spacing:-.5px; margin:6px 0 0;
+       background:linear-gradient(90deg,var(--accent2),#8fb8ff); -webkit-background-clip:text;
+       background-clip:text; color:transparent; }
+  .tagline { font-size:19px; color:var(--dim); margin:12px auto 0; max-width:600px; }
+  .tagline strong { color:var(--text); font-weight:600; }
+  /* Demo */
+  .demo { background:var(--card); border:1px solid var(--border); border-radius:16px;
+          padding:26px; margin-top:8px; }
+  .claim { background:rgba(63,111,216,.12); border:1px solid rgba(91,156,245,.4); border-radius:10px;
+           padding:12px 15px; margin-bottom:16px; font-size:14.5px; line-height:1.55; color:#d6ddf2; }
+  .claim strong { color:#fff; }
+  .demo-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; }
+  .demo-head h2 { font-size:17px; font-weight:700; }
+  select { background:var(--bg); color:var(--text); border:1px solid var(--border);
+           border-radius:8px; padding:6px 10px; font-size:13px; }
+  #drop { border:2px dashed var(--border); border-radius:14px; padding:44px 20px; text-align:center;
+          color:var(--dim); cursor:pointer; transition:border-color .15s, background .15s; }
+  #drop.hover, #drop:hover { border-color:var(--accent2); background:rgba(63,111,216,.06); }
+  #drop strong { color:var(--text); }
+  .privacy { margin-top:12px; font-size:13px; color:var(--dim); text-align:center; }
+  .result { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:14px; }
+  .result h3 { font-size:15px; margin-bottom:8px; }
+  .big { font-size:32px; font-weight:800; }
+  .verdict { font-size:14px; margin-top:2px; }
+  .good { color:var(--good); } .warn { color:var(--warn); }
+  table { width:100%; border-collapse:collapse; font-size:14px; margin-top:10px; }
+  td { padding:3px 0; vertical-align:top; }
+  td:first-child { color:var(--dim); width:42%; }
+  .err { color:var(--warn); font-size:14px; }
+  .bar { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-top:8px; }
+  .bar div { height:100%; background:linear-gradient(90deg,var(--accent),var(--good)); }
+  /* Features */
+  .features { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:40px; }
+  @media (max-width:560px){ .features { grid-template-columns:1fr; } }
+  .feat { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .feat .ic { font-size:22px; }
+  .feat h3 { font-size:16px; margin:8px 0 4px; }
+  .feat p { font-size:14px; color:var(--dim); }
+  .section-title { text-align:center; font-size:22px; font-weight:700; margin:52px 0 4px; }
+  .section-sub { text-align:center; color:var(--dim); font-size:15px; }
+  /* CTA — købssektion */
+  .cta { margin:52px 0 8px; background:var(--card); border:1px solid var(--border);
+         border-radius:16px; padding:34px 28px; text-align:center; }
+  .cta h2 { font-size:24px; margin-bottom:8px; }
+  .cta .lede { color:var(--dim); font-size:15px; max-width:52ch; margin:0 auto 22px; }
+  .buy { display:inline-flex; align-items:center; gap:12px; background:var(--accent);
+         color:#fff; border-radius:12px; padding:14px 26px; font-size:16px; font-weight:600;
+         border:1px solid #4d7ce0; transition:background .15s ease; }
+  .buy:hover { background:var(--accent2); text-decoration:none; }
+  .buy:focus-visible { outline:2px solid var(--good); outline-offset:3px; }
+  .buy .mark { font-size:22px; line-height:1; }
+  .buy small { display:block; font-size:11px; font-weight:400; opacity:.85; letter-spacing:.04em; }
+  .terms { color:var(--dim); font-size:13.5px; margin-top:16px; }
+  .terms strong { color:var(--text); font-weight:600; }
+  .specs { display:flex; flex-wrap:wrap; justify-content:center; gap:8px 20px;
+           margin-top:18px; padding-top:16px; border-top:1px solid var(--border);
+           color:var(--dim); font-size:13px; }
+  /* Footer */
+  footer { border-top:1px solid var(--border); margin-top:56px; padding:28px 20px 48px;
+           text-align:center; color:var(--dim); font-size:14px; }
+  footer a { margin:0 8px; }
+</style></head><body>
+
+<header class="hero">
+  <div class="logo">📷</div>
+  <h1>Gearscope</h1>
+  <p class="tagline">Your camera's <strong>real shutter count</strong> — straight from a photo.
+  Nikon, Sony, Fujifilm, Pentax, and the <strong>Canon R5 · R6 · R6&nbsp;Mark&nbsp;II · R8</strong>
+  that other web tools say can't be read.</p>
+</header>
+
+<div class="wrap">
+
+  <div class="demo">
+    <div class="demo-head">
+      <h2 data-t="tryTitle">Try it now — free</h2>
+      <select id="lang" aria-label="Language"></select>
+    </div>
+    <p class="claim">Some tools tell you <strong>“no website can read a Canon's shutter count from a photo.”</strong>
+      Drop a Canon R5, R6, R6&nbsp;Mark&nbsp;II or R8 file below — or any Nikon, Sony, Fujifilm or Pentax — and see for yourself.</p>
+    <div id="drop"><strong data-t="dropTitle"></strong> <span data-t="dropHint"></span><br>
+      <span data-t="buyHint"></span></div>
+    <input type="file" id="file" accept=".jpg,.jpeg,.cr3,.cr2,.nef,.arw,.raf,.pef,.heic,.hif" multiple style="display:none">
+    <div class="privacy" data-t="privacy"></div>
+    <div id="out"></div>
+  </div>
+
+  <div class="section-title">What Gearscope checks</div>
+  <div class="section-sub">Not just shutter count — the whole health of your kit.</div>
+  <div class="features">
+    <div class="feat"><div class="ic">📸</div><h3>Shutter count &amp; gear</h3>
+      <p>True actuation count, serial numbers, lens and firmware. Read from a photo for the Canon
+      R5/R6/R8 generation, Nikon, Sony, Fujifilm and Pentax.</p></div>
+    <div class="feat"><div class="ic">🔌</div><h3>USB readout <span style="color:var(--accent2);font-size:12px">· app</span></h3>
+      <p>Older Canon (RP, 5D, R7, R10, DSLRs) don't store the count in photos. The Mac app reads
+      the current count straight from the camera over USB — the only way to get it.</p></div>
+    <div class="feat"><div class="ic">💳</div><h3>SD-card test <span style="color:var(--accent2);font-size:12px">· app</span></h3>
+      <p>Measure real speed against its rating and expose fake-capacity scam cards before they lose your photos.</p></div>
+    <div class="feat"><div class="ic">🔒</div><h3>100% on your Mac</h3>
+      <p>Everything runs locally. No account, no upload, no tracking. Your serial numbers never leave your computer.</p></div>
+  </div>
+
+  <div class="cta">
+    <h2>Get Gearscope for Mac</h2>
+    <p class="lede">USB current-count for older Canon bodies, SD-card and sensor tests, wear history
+    and exportable reports. The web check above stays free, always.</p>
+    <a class="buy" href="#" aria-disabled="true">
+      <svg class="mark" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round"/>
+      </svg>
+      <span>Download on the Mac App Store<small>ONE-TIME PURCHASE · NO SUBSCRIPTION</small></span>
+    </a>
+    <p class="terms">Buy once, own it. <strong>No subscription, no account, no ads.</strong></p>
+    <div class="specs">
+      <span>macOS 13 or later</span>
+      <span>Apple Silicon &amp; Intel</span>
+      <span>13 languages</span>
+      <span>No network access required</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div>© 2026 Jonas Gertz · Gearscope</div>
+  <div style="margin-top:8px">
+    <a href="privacy.html">Privacy</a> ·
+    <a href="support.html">Support</a> ·
+    <a href="mailto:jonas@gertz-el.dk">jonas@gertz-el.dk</a>
+  </div>
+</footer>
+
+<script>
+/**
+ * GearCheckCore (JavaScript) — platform-uafhængig EXIF/MakerNotes-parser.
+ * Kører i browser (Windows/Mac/Linux), Node, Electron/Tauri.
+ * Porteret 1:1 fra den validerede Swift-kerne (GearCheckCore).
+ *
+ * API: extractGearMetadata(bytes: Uint8Array) -> {make, model, serialNumber,
+ *      internalSerialNumber, firmware, ownerName, lensModel, lensSerialNumber,
+ *      dateTimeOriginal, shutterCount}
+ */
+
+const TIFF_TYPE_SIZES = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 6: 1, 7: 1, 8: 2, 9: 4, 10: 8 };
+
+class TIFF {
+  /** @param {Uint8Array} bytes @param {number} base TIFF-headerens position */
+  constructor(bytes, base) {
+    if (base + 8 > bytes.length) throw new Error("tiff header out of range");
+    const b0 = bytes[base], b1 = bytes[base + 1];
+    if (b0 === 0x49 && b1 === 0x49) this.le = true;
+    else if (b0 === 0x4d && b1 === 0x4d) this.le = false;
+    else throw new Error("not a TIFF header");
+    this.bytes = bytes;
+    this.view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    this.base = base;
+  }
+
+  /** IFD-kontekst uden TIFF-header (Fuji MakerNotes o.l.): angiv base og byteorden direkte. */
+  static raw(bytes, base, littleEndian) {
+    const t = Object.create(TIFF.prototype);
+    t.bytes = bytes;
+    t.view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    t.base = base;
+    t.le = littleEndian;
+    return t;
+  }
+
+  u16(pos) { return pos >= 0 && pos + 2 <= this.bytes.length ? this.view.getUint16(pos, this.le) : null; }
+  u32(pos) { return pos >= 0 && pos + 4 <= this.bytes.length ? this.view.getUint32(pos, this.le) : null; }
+
+  firstIFD() {
+    const off = this.u32(this.base + 4);
+    return off == null ? null : this.base + off;
+  }
+
+  entries(ifdPos) {
+    const n = this.u16(ifdPos);
+    if (n == null || n === 0 || n >= 1000) return [];
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const e = ifdPos + 2 + i * 12;
+      const tag = this.u16(e), type = this.u16(e + 2), count = this.u32(e + 4);
+      if (tag == null || type == null || count == null) continue;
+      const size = (TIFF_TYPE_SIZES[type] || 1) * count;
+      let valuePos;
+      if (size <= 4) valuePos = e + 8;
+      else {
+        const off = this.u32(e + 8);
+        if (off == null) continue;
+        valuePos = this.base + off;
+      }
+      if (valuePos < 0 || valuePos + size > this.bytes.length) continue;
+      out.push({ tag, type, count, valuePos, byteCount: size });
+    }
+    return out;
+  }
+
+  string(e) {
+    if (e.type !== 2 && e.type !== 7) return null;
+    let end = e.valuePos + e.byteCount;
+    const raw = this.bytes.subarray(e.valuePos, end);
+    let s = "";
+    for (const b of raw) s += String.fromCharCode(b); // latin1; EXIF-strenge er ASCII
+    s = s.replace(/\0+/g, "").trim();
+    return s.length ? s : null;
+  }
+
+  uint(e) {
+    if (e.type === 3) return this.u16(e.valuePos);
+    if (e.type === 4) return this.u32(e.valuePos);
+    return null;
+  }
+
+  // Rational (type 5): to u32 = tæller/nævner
+  rational(e) {
+    if (e.type !== 5) return null;
+    const num = this.u32(e.valuePos), den = this.u32(e.valuePos + 4);
+    return num == null || den == null || den === 0 ? null : num / den;
+  }
+
+  entry(list, tag) { return list.find((e) => e.tag === tag) || null; }
+}
+
+const ExifTag = {
+  make: 0x010f, model: 0x0110, exifIFDPointer: 0x8769, dateTimeOriginal: 0x9003,
+  focalLength: 0x920a, makerNotes: 0x927c, ownerName: 0xa430, serialNumber: 0xa431,
+  lensModel: 0xa434, lensSerialNumber: 0xa435,
+};
+
+const CanonTag = { firmware: 0x0007, ownerName: 0x0009, cameraInfo: 0x000d, lensModel: 0x0095, internalSerial: 0x0096 };
+
+/** Canons CameraInfo-blob: modelmønster → ShutterCount-offset (u32 LE). */
+const CANON_CAMERAINFO_SHUTTER = [
+  { patterns: ["EOS R6m2", "EOS R6 Mark II", "EOS R8", "EOS R50", "EOS R100"], offset: 0x0d29 },
+  // Suffiks-match er vigtigt: "EOS R5" må ikke matche "EOS R5m2" (ukendt layout)
+  { patterns: ["EOS R5", "EOS R6"], offset: 0x0af1 },
+];
+
+function canonShutterCount(blob, model) {
+  for (const layout of CANON_CAMERAINFO_SHUTTER) {
+    if (!layout.patterns.some((p) => model.endsWith(p))) continue;
+    if (layout.offset + 4 > blob.length) return null;
+    const v = blob[layout.offset] | (blob[layout.offset + 1] << 8)
+            | (blob[layout.offset + 2] << 16) | (blob[layout.offset + 3] << 24);
+    return v >= 0 && v < 10_000_000 ? v : null; // sanity: aldrig > 10 mio.
+  }
+  return null;
+}
+
+function newMeta() {
+  return { make: null, model: null, serialNumber: null, internalSerialNumber: null,
+           firmware: null, ownerName: null, lensModel: null, lensSerialNumber: null,
+           dateTimeOriginal: null, shutterCount: null, focalLength: null };
+}
+
+function absorbExifEntries(meta, tiff, entries) {
+  const take = (tag, field) => {
+    const e = tiff.entry(entries, tag);
+    if (e && meta[field] == null) meta[field] = tiff.string(e);
+  };
+  take(ExifTag.dateTimeOriginal, "dateTimeOriginal");
+  if (meta.focalLength == null) {
+    const fe = tiff.entry(entries, ExifTag.focalLength);
+    const f = fe && tiff.rational(fe);
+    if (f != null && f > 0 && f < 5000) meta.focalLength = Math.round(f);
+  }
+  take(ExifTag.serialNumber, "serialNumber");
+  take(ExifTag.lensModel, "lensModel");
+  take(ExifTag.lensSerialNumber, "lensSerialNumber");
+  take(ExifTag.ownerName, "ownerName");
+  const mn = tiff.entry(entries, ExifTag.makerNotes);
+  if (mn) absorbMakerNotes(meta, tiff, mn);
+}
+
+/** Dispatch på MakerNotes-headeren — hver producent har sit eget format. */
+function absorbMakerNotes(meta, tiff, mn) {
+  const b = tiff.bytes, p = mn.valuePos;
+  const startsWith = (s) => {
+    for (let i = 0; i < s.length; i++) if (b[p + i] !== s.charCodeAt(i)) return false;
+    return true;
+  };
+  if (startsWith("Nikon\0")) {
+    // "Nikon\0" + version(2) + pad(2), derefter en komplet indlejret TIFF
+    try {
+      const inner = new TIFF(b, p + 10);
+      const ifd = inner.firstIFD();
+      if (ifd != null) absorbNikon(meta, inner, inner.entries(ifd));
+    } catch { /* videre */ }
+  } else if (startsWith("SONY DSC") || startsWith("SONY CAM")) {
+    // 12-byte header, derefter IFD; offsets relative til ydre TIFF-base
+    absorbSony(meta, tiff, tiff.entries(p + 12));
+  } else if (startsWith("FUJIFILM")) {
+    // "FUJIFILM" + u32 LE offset til IFD; offsets relative til MakerNotes-start, altid LE
+    const raw = TIFF.raw(b, p, true);
+    const ifdOff = raw.u32(p + 8);
+    if (ifdOff != null) absorbFuji(meta, raw, raw.entries(p + ifdOff));
+  } else if (startsWith("PENTAX \0") || startsWith("AOC\0")) {
+    // "PENTAX \0" + byteorden(2) + IFD på +10, eller ældre "AOC\0" + byteorden(2) + IFD på +6.
+    // Offsets relative til MakerNotes-start.
+    const hdrLen = b[p] === 0x50 ? 8 : 4; // "PENTAX \0" : "AOC\0"
+    const le = b[p + hdrLen] === 0x49;
+    const raw = TIFF.raw(b, p, le);
+    absorbPentax(meta, raw, raw.entries(p + hdrLen + 2));
+  } else if ((meta.make || "").toUpperCase().includes("SONY")) {
+    // Sony ARW: ingen header, IFD direkte, offsets relative til ydre TIFF-base
+    absorbSony(meta, tiff, tiff.entries(p));
+  } else {
+    // Canon: ingen header, IFD direkte, offsets relative til ydre TIFF-base
+    absorbCanon(meta, tiff, tiff.entries(p));
+  }
+}
+
+const NikonTag = { serialNumber: 0x001d, mechanicalShutterCount: 0x0037, shutterCount: 0x00a7 };
+
+function absorbNikon(meta, tiff, entries) {
+  const ser = tiff.entry(entries, NikonTag.serialNumber);
+  if (ser && meta.serialNumber == null) meta.serialNumber = tiff.string(ser);
+  if (meta.shutterCount == null) {
+    const sc = tiff.entry(entries, NikonTag.shutterCount);
+    if (sc) {
+      const v = tiff.uint(sc);
+      if (v != null && v < 10_000_000) meta.shutterCount = v;
+    }
+  }
+}
+
+const SonyTag = { tag9050: 0x9050 };
+// Offsets inde i den dechifrerede 9050-blob afhænger af modelgeneration.
+// Præcis modelnavn-match (ikke substreng: "ILCE-7M2" må ikke ramme 7M3-gruppen).
+const SONY_9050_OLD = new Set([ // ~2013-2015-generationen (verificeret: ILCE-7M2, ILCE-6000)
+  // NB: ILCE-6300/6500 hører til mellemgruppen (0x003a) trods alderen — verificeret på A6300
+  "ILCE-7", "ILCE-7R", "ILCE-7S", "ILCE-7M2", "ILCE-7RM2", "ILCE-7SM2",
+  "ILCE-5000", "ILCE-5100", "ILCE-6000", "ILCE-QX1",
+]);
+const SONY_9050_NEWEST = new Set([ // 2023+-generationen (verificeret: ILCE-6700)
+  "ILCE-6700", "ILCE-7CM2", "ILCE-7CR", "ILCE-9M3", "ILCE-1M2", "ZV-E1",
+]);
+function sony9050Offsets(model) {
+  if (SONY_9050_OLD.has(model)) return { shutterCount: 0x0032, internalSerial: null };
+  if (SONY_9050_NEWEST.has(model)) return { shutterCount: 0x000a, internalSerial: null };
+  return { shutterCount: 0x003a, internalSerial: 0x0088 }; // 2016-2022 (bredt verificeret)
+}
+const SONY_INTERNAL_SERIAL_LEN = 6;
+
+/** Sonys 0x9050-blob er chifreret med substitutionen c = (p³) mod 249; dechifrering = invers tabel. */
+let SONY_DECIPHER_TABLE = null;
+function sonyDecipher(blob) {
+  if (!SONY_DECIPHER_TABLE) {
+    SONY_DECIPHER_TABLE = new Uint8Array(256);
+    for (let p = 0; p < 249; p++) SONY_DECIPHER_TABLE[(p * p * p) % 249] = p;
+    for (let c = 249; c < 256; c++) SONY_DECIPHER_TABLE[c] = c;
+  }
+  const out = new Uint8Array(blob.length);
+  for (let i = 0; i < blob.length; i++) out[i] = SONY_DECIPHER_TABLE[blob[i]];
+  return out;
+}
+
+function absorbSony(meta, tiff, entries) {
+  const e = tiff.entry(entries, SonyTag.tag9050);
+  if (!e) return;
+  const plain = sonyDecipher(tiff.bytes.subarray(e.valuePos, e.valuePos + e.byteCount));
+  const offsets = sony9050Offsets(meta.model || "");
+  const o = offsets.shutterCount;
+  if (meta.shutterCount == null && o + 4 <= plain.length) {
+    const v = plain[o] | (plain[o + 1] << 8) | (plain[o + 2] << 16) | (plain[o + 3] << 24);
+    if (v >= 0 && v < 10_000_000) meta.shutterCount = v;
+  }
+  const s = offsets.internalSerial;
+  if (s != null && meta.internalSerialNumber == null && s + SONY_INTERNAL_SERIAL_LEN <= plain.length) {
+    let hex = "";
+    for (let i = 0; i < SONY_INTERNAL_SERIAL_LEN; i++) hex += plain[s + i].toString(16).padStart(2, "0");
+    if (!/^0+$/.test(hex)) meta.internalSerialNumber = hex;
+  }
+}
+
+// ---------- Pentax ----------
+
+const PentaxTag = { date: 0x0006, time: 0x0007, shutterCount: 0x005d, serialNumber: 0x0229 };
+
+function absorbPentax(meta, tiff, entries) {
+  const ser = tiff.entry(entries, PentaxTag.serialNumber);
+  if (ser && meta.serialNumber == null) meta.serialNumber = tiff.string(ser);
+  if (meta.shutterCount != null) return;
+  const scE = tiff.entry(entries, PentaxTag.shutterCount);
+  const dE = tiff.entry(entries, PentaxTag.date);
+  const tE = tiff.entry(entries, PentaxTag.time);
+  if (!scE || !dE || !tE || scE.byteCount < 4 || dE.byteCount < 4 || tE.byteCount < 3) return;
+  const b = tiff.bytes;
+  const be32 = (p) => ((b[p] << 24 | b[p + 1] << 16 | b[p + 2] << 8 | b[p + 3]) >>> 0);
+  // Pentax obfuskerer tælleren med billedets egen dato/tid:
+  // klartekst = rå ^ dato ^ (0xffffffff - tid), alle som u32 BE (tid: 3 bytes + nul)
+  const raw = be32(scE.valuePos);
+  const date = be32(dE.valuePos);
+  const time = ((b[tE.valuePos] << 24 | b[tE.valuePos + 1] << 16 | b[tE.valuePos + 2] << 8) >>> 0);
+  const v = (raw ^ date ^ (0xffffffff - time)) >>> 0;
+  if (v < 10_000_000) meta.shutterCount = v;
+}
+
+const FujiTag = { internalSerial: 0x0010, imageCount: 0x1438 };
+
+function absorbFuji(meta, tiff, entries) {
+  const ser = tiff.entry(entries, FujiTag.internalSerial);
+  if (ser && meta.internalSerialNumber == null) meta.internalSerialNumber = tiff.string(ser);
+  if (meta.shutterCount == null) {
+    const ic = tiff.entry(entries, FujiTag.imageCount);
+    if (ic) {
+      let v = tiff.uint(ic);
+      if (v != null && ic.type === 3) v &= 0x7fff; // Fuji sætter topbit som flag i u16-tælleren
+      if (v != null && v < 10_000_000) meta.shutterCount = v;
+    }
+  }
+}
+
+function absorbCanon(meta, tiff, entries) {
+  const take = (tag, field) => {
+    const e = tiff.entry(entries, tag);
+    if (e && meta[field] == null) meta[field] = tiff.string(e);
+  };
+  take(CanonTag.firmware, "firmware");
+  take(CanonTag.ownerName, "ownerName");
+  take(CanonTag.lensModel, "lensModel");
+  take(CanonTag.internalSerial, "internalSerialNumber");
+  if (meta.shutterCount == null && meta.model) {
+    const e = tiff.entry(entries, CanonTag.cameraInfo);
+    if (e) {
+      const blob = tiff.bytes.subarray(e.valuePos, e.valuePos + e.byteCount);
+      meta.shutterCount = canonShutterCount(blob, meta.model);
+    }
+  }
+}
+
+function absorbIFD0(meta, tiff, ifd0Pos) {
+  const ifd0 = tiff.entries(ifd0Pos);
+  const mk = tiff.entry(ifd0, ExifTag.make);
+  if (mk && meta.make == null) meta.make = tiff.string(mk);
+  const md = tiff.entry(ifd0, ExifTag.model);
+  if (md && meta.model == null) meta.model = tiff.string(md);
+  const ex = tiff.entry(ifd0, ExifTag.exifIFDPointer);
+  if (ex) {
+    const off = tiff.uint(ex);
+    if (off != null) absorbExifEntries(meta, tiff, tiff.entries(tiff.base + off));
+  }
+  absorbExifEntries(meta, tiff, ifd0); // CMT2 o.l. ER en ExifIFD direkte
+}
+
+// ---------- JPEG ----------
+
+function parseJPEG(bytes) {
+  const meta = newMeta();
+  let pos = 2;
+  const n = bytes.length;
+  while (pos + 4 <= n) {
+    if (bytes[pos] !== 0xff) break;
+    const marker = bytes[pos + 1];
+    if (marker === 0xd9 || marker === 0xda) break;
+    const segLen = (bytes[pos + 2] << 8) | bytes[pos + 3];
+    if (segLen < 2) break;
+    if (marker === 0xe1 && pos + 10 <= n
+        && bytes[pos + 4] === 0x45 && bytes[pos + 5] === 0x78   // "Ex"
+        && bytes[pos + 6] === 0x69 && bytes[pos + 7] === 0x66   // "if"
+        && bytes[pos + 8] === 0x00 && bytes[pos + 9] === 0x00) {
+      try {
+        const tiff = new TIFF(bytes, pos + 10);
+        const ifd0 = tiff.firstIFD();
+        if (ifd0 != null) absorbIFD0(meta, tiff, ifd0);
+      } catch { /* videre */ }
+      break;
+    }
+    pos += 2 + segLen;
+  }
+  if (meta.model == null && meta.make == null) throw new Error("no Exif data found in JPEG");
+  return meta;
+}
+
+// ---------- CR3 (ISO-BMFF) ----------
+
+const CANON_UUID = [0x85, 0xc0, 0xb6, 0x87, 0x82, 0x0f, 0x11, 0xe0, 0x81, 0x11, 0xf4, 0xce, 0x46, 0x2b, 0x6a, 0x48];
+
+function parseCR3(bytes) {
+  const meta = newMeta();
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const be32 = (p) => (p >= 0 && p + 4 <= bytes.length ? view.getUint32(p, false) : null);
+  const le32 = (p) => (p >= 0 && p + 4 <= bytes.length ? view.getUint32(p, true) : null);
+  const le16 = (p) => (p >= 0 && p + 2 <= bytes.length ? view.getUint16(p, true) : null);
+  const fourCC = (p) => String.fromCharCode(bytes[p], bytes[p + 1], bytes[p + 2], bytes[p + 3]);
+
+  function walkBoxes(start, end, handler) {
+    let pos = start;
+    while (pos + 8 <= end) {
+      let size = be32(pos);
+      if (size == null) return;
+      const type = fourCC(pos + 4);
+      let header = 8;
+      if (size === 1) {
+        const hi = be32(pos + 8), lo = be32(pos + 12);
+        if (hi == null || lo == null) return;
+        size = hi * 2 ** 32 + lo;
+        header = 16;
+      } else if (size === 0) size = end - pos;
+      if (size < header || pos + size > end) return;
+      handler(type, pos + header, pos + size);
+      pos += size;
+    }
+  }
+
+  // 1) moov → Canon-uuid → CMT1/2/3
+  let moov = null;
+  walkBoxes(0, bytes.length, (t, s, e) => { if (t === "moov") moov = [s, e]; });
+  if (!moov) throw new Error("no moov box");
+
+  walkBoxes(moov[0], moov[1], (t, s, e) => {
+    if (t !== "uuid" || s + 16 > e) return;
+    for (let i = 0; i < 16; i++) if (bytes[s + i] !== CANON_UUID[i]) return;
+    walkBoxes(s + 16, e, (ct, cs) => {
+      try {
+        const tiff = new TIFF(bytes, cs);
+        const ifd = tiff.firstIFD();
+        if (ifd == null) return;
+        if (ct === "CMT1") absorbIFD0(meta, tiff, ifd);
+        else if (ct === "CMT2") absorbExifEntries(meta, tiff, tiff.entries(ifd));
+        else if (ct === "CMT3") absorbCanon(meta, tiff, tiff.entries(ifd));
+      } catch { /* videre */ }
+    });
+  });
+
+  // 2) CTMD-tracken (ShutterCount)
+  let ctmdOffset = null, ctmdSize = null;
+  walkBoxes(moov[0], moov[1], (t, s, e) => {
+    if (t !== "trak") return;
+    let isCTMD = false, chunkOffset = null, sampleSize = null;
+    const descend = (s2, e2) => walkBoxes(s2, e2, (bt, bs, be) => {
+      if (bt === "mdia" || bt === "minf" || bt === "stbl") descend(bs, be);
+      else if (bt === "stsd") { if (fourCC(bs + 12) === "CTMD") isCTMD = true; }
+      else if (bt === "stco") { if ((be32(bs + 4) ?? 0) >= 1) chunkOffset = be32(bs + 8); }
+      else if (bt === "co64") {
+        if ((be32(bs + 4) ?? 0) >= 1) {
+          const hi = be32(bs + 8), lo = be32(bs + 12);
+          if (hi != null && lo != null) chunkOffset = hi * 2 ** 32 + lo;
+        }
+      } else if (bt === "stsz") {
+        const fixed = be32(bs + 4);
+        if (fixed) sampleSize = fixed;
+        else if ((be32(bs + 8) ?? 0) >= 1) sampleSize = be32(bs + 12);
+      }
+    });
+    descend(s, e);
+    if (isCTMD && chunkOffset != null && sampleSize != null) { ctmdOffset = chunkOffset; ctmdSize = sampleSize; }
+  });
+
+  if (ctmdOffset != null && ctmdSize != null && ctmdOffset + ctmdSize <= bytes.length) {
+    let pos = ctmdOffset;
+    const end = ctmdOffset + ctmdSize;
+    while (pos + 12 <= end) {
+      const recSize = le32(pos), recType = le16(pos + 4);
+      if (recSize == null || recSize < 12 || pos + recSize > end || recType == null) break;
+      if (recType >= 7 && recType <= 9) {
+        let sub = pos + 12;
+        const subEnd = pos + recSize;
+        while (sub + 8 <= subEnd) {
+          const subSize = le32(sub), tag = le32(sub + 4);
+          if (subSize == null || subSize < 8 || sub + subSize > subEnd || tag == null) break;
+          try {
+            const tiff = new TIFF(bytes, sub + 8);
+            const ifd = tiff.firstIFD();
+            if (ifd != null) {
+              if (tag === 0x927c) absorbCanon(meta, tiff, tiff.entries(ifd));
+              else if (tag === 0x8769) absorbExifEntries(meta, tiff, tiff.entries(ifd));
+            }
+          } catch { /* videre */ }
+          sub += subSize;
+        }
+      }
+      pos += recSize;
+    }
+  }
+
+  if (meta.model == null) throw new Error("no metadata found in CR3");
+  return meta;
+}
+
+// ---------- TIFF-baserede RAW-filer (Nikon NEF, Sony ARW, Canon CR2, DNG...) ----------
+
+function parseTIFFFile(bytes) {
+  const meta = newMeta();
+  const tiff = new TIFF(bytes, 0);
+  const ifd0 = tiff.firstIFD();
+  if (ifd0 == null) throw new Error("no IFD in TIFF file");
+  absorbIFD0(meta, tiff, ifd0);
+  if (meta.model == null && meta.make == null) throw new Error("no metadata found in TIFF file");
+  return meta;
+}
+
+// ---------- Fuji RAF: eget format med indlejret JPEG, hvor EXIF bor ----------
+
+function parseRAF(bytes) {
+  // Header: "FUJIFILMCCD-RAW " ... u32 BE på offset 84 = JPEG-offset, offset 88 = længde
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const jpegOff = view.getUint32(84, false);
+  const jpegLen = view.getUint32(88, false);
+  if (jpegOff + jpegLen > bytes.length || bytes[jpegOff] !== 0xff || bytes[jpegOff + 1] !== 0xd8)
+    throw new Error("no embedded JPEG in RAF");
+  return parseJPEG(bytes.subarray(jpegOff, jpegOff + jpegLen));
+}
+
+// ---------- HEIF/HEIC (og Canon HIF) ----------
+// Exif ligger som "item": meta → iinf (find item-ID for 'Exif') → iloc (filposition).
+// Payload: u32 BE header-offset + (evt. "Exif\0\0" +) TIFF.
+
+function parseHEIF(bytes) {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const be16 = (p) => (p >= 0 && p + 2 <= bytes.length ? view.getUint16(p, false) : null);
+  const be32 = (p) => (p >= 0 && p + 4 <= bytes.length ? view.getUint32(p, false) : null);
+  const beN = (p, size) => {
+    if (size === 0) return 0;
+    if (p < 0 || p + size > bytes.length) return null;
+    let v = 0;
+    for (let i = 0; i < size; i++) v = v * 256 + bytes[p + i];
+    return v;
+  };
+  const fourCC = (p) => String.fromCharCode(bytes[p], bytes[p + 1], bytes[p + 2], bytes[p + 3]);
+
+  function walkBoxes(start, end, handler) {
+    let pos = start;
+    while (pos + 8 <= end) {
+      let size = be32(pos);
+      if (size == null) return;
+      const type = fourCC(pos + 4);
+      let header = 8;
+      if (size === 1) {
+        const hi = be32(pos + 8), lo = be32(pos + 12);
+        if (hi == null || lo == null) return;
+        size = hi * 2 ** 32 + lo;
+        header = 16;
+      } else if (size === 0) size = end - pos;
+      if (size < header || pos + size > end) return;
+      handler(type, pos + header, pos + size);
+      pos += size;
+    }
+  }
+
+  let metaRange = null;
+  walkBoxes(0, bytes.length, (t, s, e) => { if (t === "meta") metaRange = [s + 4, e]; });
+  if (!metaRange) throw new Error("no meta box in HEIF");
+
+  // iinf → Exif-itemets ID
+  let exifItemID = null;
+  walkBoxes(metaRange[0], metaRange[1], (t, s, e) => {
+    if (t !== "iinf" || exifItemID != null) return;
+    const version = bytes[s];
+    const entriesStart = s + 4 + (version === 0 ? 2 : 4);
+    walkBoxes(entriesStart, e, (it, is_, ie) => {
+      if (it !== "infe" || exifItemID != null) return;
+      const v = bytes[is_];
+      if (v < 2) return;
+      const itemID = v === 2 ? be16(is_ + 4) : be32(is_ + 4);
+      const typePos = v === 2 ? is_ + 8 : is_ + 10;
+      if (fourCC(typePos) === "Exif") exifItemID = itemID;
+    });
+  });
+  if (exifItemID == null) throw new Error("no Exif item in HEIF");
+
+  // iloc → filposition
+  let exifOffset = null, exifLength = null;
+  walkBoxes(metaRange[0], metaRange[1], (t, s, e) => {
+    if (t !== "iloc" || exifOffset != null) return;
+    const version = bytes[s];
+    let p = s + 4;
+    const sizes = be16(p); p += 2;
+    const offsetSize = (sizes >> 12) & 0xf;
+    const lengthSize = (sizes >> 8) & 0xf;
+    const baseOffsetSize = (sizes >> 4) & 0xf;
+    const indexSize = version >= 1 ? (sizes & 0xf) : 0;
+    let itemCount;
+    if (version < 2) { itemCount = be16(p); p += 2; } else { itemCount = be32(p); p += 4; }
+    for (let i = 0; i < itemCount; i++) {
+      let id;
+      if (version < 2) { id = be16(p); p += 2; } else { id = be32(p); p += 4; }
+      let constructionMethod = 0;
+      if (version >= 1) { constructionMethod = be16(p) & 0xf; p += 2; }
+      p += 2; // data_reference_index
+      const baseOffset = beN(p, baseOffsetSize); p += baseOffsetSize;
+      const extentCount = be16(p); p += 2;
+      for (let ext = 0; ext < extentCount; ext++) {
+        if (indexSize > 0) p += indexSize;
+        const extOffset = beN(p, offsetSize); p += offsetSize;
+        const extLength = beN(p, lengthSize); p += lengthSize;
+        if (id === exifItemID && ext === 0 && constructionMethod === 0) {
+          exifOffset = baseOffset + extOffset;
+          exifLength = extLength;
+        }
+      }
+    }
+  });
+  if (exifOffset == null || exifLength == null || exifOffset + exifLength > bytes.length || exifLength <= 8)
+    throw new Error("Exif item location invalid in HEIF");
+
+  // Scan efter TIFF-magic efter 4-byte præfikset
+  const meta = newMeta();
+  const scanEnd = Math.min(exifOffset + 4 + 32, exifOffset + exifLength);
+  for (let pos = exifOffset + 4; pos + 8 <= scanEnd; pos++) {
+    const b0 = bytes[pos], b1 = bytes[pos + 1];
+    if ((b0 === 0x49 && b1 === 0x49) || (b0 === 0x4d && b1 === 0x4d)) {
+      try {
+        const tiff = new TIFF(bytes, pos);
+        const ifd0 = tiff.firstIFD();
+        if (ifd0 != null) { absorbIFD0(meta, tiff, ifd0); break; }
+      } catch { /* videre */ }
+    }
+  }
+  if (meta.model == null && meta.make == null) throw new Error("no readable Exif in HEIF");
+  return meta;
+}
+
+// ---------- Indgang ----------
+
+function extractGearMetadata(bytes) {
+  if (bytes.length > 100) {
+    if (bytes[0] === 0xff && bytes[1] === 0xd8) return parseJPEG(bytes);
+    if (bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70) {
+      // Brand på offset 8: "crx " = Canon CR3; alt andet = HEIF-familien (heic/HIF…)
+      const isCRX = bytes[8] === 0x63 && bytes[9] === 0x72 && bytes[10] === 0x78 && bytes[11] === 0x20;
+      return isCRX ? parseCR3(bytes) : parseHEIF(bytes);
+    }
+    if ((bytes[0] === 0x49 && bytes[1] === 0x49) || (bytes[0] === 0x4d && bytes[1] === 0x4d))
+      return parseTIFFFile(bytes);
+    const fuji = "FUJIFILMCCD-RAW";
+    if ([...fuji].every((ch, i) => bytes[i] === ch.charCodeAt(0))) return parseRAF(bytes);
+  }
+  throw new Error("unsupported file format");
+}
+
+
+/**
+ * Gearscope UI-oversættelser. Ét nyt sprog = én ny blok — ingen kodeændringer.
+ * Nøglerne må aldrig omdøbes uden at opdatere alle sprog.
+ * {pct} og {life} er pladsholdere, der udfyldes af koden.
+ */
+const I18N = {
+  en: {
+    name: "English",
+    sub: "Instant shutter count, serial number & gear info — straight from your photo file.",
+    dropTitle: "Drop an original photo here",
+    dropHint: "(JPG or CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) or click to choose.",
+    buyHint: "Buying used gear? Ask the seller for one unedited photo and drop it here.",
+    privacy: "🔒 Everything runs locally in your browser — your photo is never uploaded.",
+    verdictNew: "Practically new shutter",
+    verdictLight: "Lightly used — plenty of life left",
+    verdictUsed: "Well used — factor into the price",
+    verdictHigh: "High wear — shutter approaching its rating",
+    rating: "{pct}% of typical {life}-actuation rating",
+    noCount: "No shutter count in this file — this model may not embed it (older Canon and others), or the file was re-exported. USB readout needed.",
+    bodySerial: "Body serial",
+    lens: "Lens",
+    lensSerial: "Lens serial",
+    firmware: "Firmware",
+    taken: "Photo taken",
+    owner: "Owner name in file",
+    readError: "Could not read this file:",
+    unknownCamera: "Unknown camera",
+  },
+  da: {
+    name: "Dansk",
+    sub: "Øjeblikkelig shutter count, serienummer og udstyrsinfo — direkte fra din billedfil.",
+    dropTitle: "Træk et originalbillede herind",
+    dropHint: "(JPG eller CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) eller klik for at vælge.",
+    buyHint: "Køber du brugt udstyr? Bed sælger om ét uredigeret billede og træk det herind.",
+    privacy: "🔒 Alt kører lokalt i din browser — dit billede uploades aldrig.",
+    verdictNew: "Praktisk talt ny lukker",
+    verdictLight: "Let brugt — masser af liv tilbage",
+    verdictUsed: "Godt brugt — pris det ind",
+    verdictHigh: "Højt slid — lukkeren nærmer sig sin rating",
+    rating: "{pct} % af typisk rating på {life} udløsninger",
+    noCount: "Ingen shutter count i denne fil — modellen skriver den muligvis ikke (ældre Canon m.fl.), eller filen er re-eksporteret. Kræver USB-aflæsning.",
+    bodySerial: "Hus-serienummer",
+    lens: "Objektiv",
+    lensSerial: "Objektiv-serienummer",
+    firmware: "Firmware",
+    taken: "Billede taget",
+    owner: "Ejernavn i filen",
+    readError: "Kunne ikke læse denne fil:",
+    unknownCamera: "Ukendt kamera",
+  },
+  de: {
+    name: "Deutsch",
+    sub: "Sofortige Auslösungszahl, Seriennummer & Ausrüstungsinfos — direkt aus Ihrer Bilddatei.",
+    dropTitle: "Originalfoto hier ablegen",
+    dropHint: "(JPG oder CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) oder klicken zum Auswählen.",
+    buyHint: "Gebrauchtkauf? Bitten Sie den Verkäufer um ein unbearbeitetes Foto und legen Sie es hier ab.",
+    privacy: "🔒 Alles läuft lokal in Ihrem Browser — Ihr Foto wird nie hochgeladen.",
+    verdictNew: "Praktisch neuer Verschluss",
+    verdictLight: "Leicht genutzt — noch viel Lebensdauer übrig",
+    verdictUsed: "Stark genutzt — in den Preis einrechnen",
+    verdictHigh: "Hoher Verschleiß — Verschluss nähert sich seiner Auslegung",
+    rating: "{pct} % der typischen Auslegung von {life} Auslösungen",
+    noCount: "Keine Auslösungszahl in dieser Datei — dieses Modell speichert sie evtl. nicht (ältere Canon u. a.), oder die Datei wurde neu exportiert. USB-Auslesung nötig.",
+    bodySerial: "Gehäuse-Seriennummer",
+    lens: "Objektiv",
+    lensSerial: "Objektiv-Seriennummer",
+    firmware: "Firmware",
+    taken: "Aufnahmedatum",
+    owner: "Besitzername in der Datei",
+    readError: "Datei konnte nicht gelesen werden:",
+    unknownCamera: "Unbekannte Kamera",
+  },
+  fr: {
+    name: "Français",
+    sub: "Nombre de déclenchements, numéro de série et infos matériel — directement depuis votre fichier photo.",
+    dropTitle: "Déposez une photo originale ici",
+    dropHint: "(JPG ou CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) ou cliquez pour choisir.",
+    buyHint: "Achat d'occasion ? Demandez au vendeur une photo non retouchée et déposez-la ici.",
+    privacy: "🔒 Tout s'exécute localement dans votre navigateur — votre photo n'est jamais envoyée.",
+    verdictNew: "Obturateur quasi neuf",
+    verdictLight: "Peu utilisé — encore beaucoup de vie",
+    verdictUsed: "Bien utilisé — à négocier dans le prix",
+    verdictHigh: "Usure élevée — l'obturateur approche de sa limite",
+    rating: "{pct} % de l'endurance typique de {life} déclenchements",
+    noCount: "Pas de compteur de déclenchements dans ce fichier — ce modèle ne l'enregistre peut-être pas (anciens Canon, etc.), ou le fichier a été réexporté. Lecture USB nécessaire.",
+    bodySerial: "N° de série du boîtier",
+    lens: "Objectif",
+    lensSerial: "N° de série de l'objectif",
+    firmware: "Firmware",
+    taken: "Photo prise le",
+    owner: "Nom du propriétaire dans le fichier",
+    readError: "Impossible de lire ce fichier :",
+    unknownCamera: "Appareil inconnu",
+  },
+  es: {
+    name: "Español",
+    sub: "Número de disparos, número de serie e info del equipo — directamente de tu archivo de foto.",
+    dropTitle: "Suelta una foto original aquí",
+    dropHint: "(JPG o CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) o haz clic para elegir.",
+    buyHint: "¿Compras equipo usado? Pide al vendedor una foto sin editar y suéltala aquí.",
+    privacy: "🔒 Todo se ejecuta localmente en tu navegador — tu foto nunca se sube.",
+    verdictNew: "Obturador prácticamente nuevo",
+    verdictLight: "Poco usado — mucha vida por delante",
+    verdictUsed: "Bastante usado — negócialo en el precio",
+    verdictHigh: "Desgaste alto — el obturador se acerca a su límite",
+    rating: "{pct} % de la vida útil típica de {life} disparos",
+    noCount: "No hay contador de disparos en este archivo — puede que este modelo no lo guarde (Canon antiguas y otras), o el archivo fue reexportado. Se necesita lectura por USB.",
+    bodySerial: "N.º de serie del cuerpo",
+    lens: "Objetivo",
+    lensSerial: "N.º de serie del objetivo",
+    firmware: "Firmware",
+    taken: "Foto tomada",
+    owner: "Nombre del propietario en el archivo",
+    readError: "No se pudo leer este archivo:",
+    unknownCamera: "Cámara desconocida",
+  },
+  it: {
+    name: "Italiano",
+    sub: "Numero di scatti, numero di serie e info attrezzatura — direttamente dal tuo file foto.",
+    dropTitle: "Trascina qui una foto originale",
+    dropHint: "(JPG o CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) oppure clicca per scegliere.",
+    buyHint: "Compri usato? Chiedi al venditore una foto non modificata e trascinala qui.",
+    privacy: "🔒 Tutto funziona in locale nel tuo browser — la tua foto non viene mai caricata.",
+    verdictNew: "Otturatore praticamente nuovo",
+    verdictLight: "Poco usato — ancora tanta vita",
+    verdictUsed: "Molto usato — da considerare nel prezzo",
+    verdictHigh: "Usura elevata — l'otturatore si avvicina al suo limite",
+    rating: "{pct} % della durata tipica di {life} scatti",
+    noCount: "Nessun contatore scatti in questo file — questo modello potrebbe non salvarlo (Canon meno recenti e altre), o il file è stato riesportato. Serve la lettura via USB.",
+    bodySerial: "Seriale del corpo",
+    lens: "Obiettivo",
+    lensSerial: "Seriale dell'obiettivo",
+    firmware: "Firmware",
+    taken: "Foto scattata",
+    owner: "Nome del proprietario nel file",
+    readError: "Impossibile leggere questo file:",
+    unknownCamera: "Fotocamera sconosciuta",
+  },
+  nl: {
+    name: "Nederlands",
+    sub: "Direct sluiterteller, serienummer & gear-info — rechtstreeks uit je fotobestand.",
+    dropTitle: "Sleep hier een originele foto naartoe",
+    dropHint: "(JPG of CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) of klik om te kiezen.",
+    buyHint: "Tweedehands kopen? Vraag de verkoper om één onbewerkte foto en sleep die hierheen.",
+    privacy: "🔒 Alles draait lokaal in je browser — je foto wordt nooit geüpload.",
+    verdictNew: "Praktisch nieuwe sluiter",
+    verdictLight: "Licht gebruikt — nog volop levensduur",
+    verdictUsed: "Flink gebruikt — verreken het in de prijs",
+    verdictHigh: "Hoge slijtage — sluiter nadert zijn levensduur",
+    rating: "{pct}% van de typische levensduur van {life} ontspanningen",
+    noCount: "Geen sluiterteller in dit bestand — dit model slaat hem mogelijk niet op (oudere Canon e.a.), of het bestand is opnieuw geëxporteerd. USB-uitlezing nodig.",
+    bodySerial: "Serienummer body",
+    lens: "Objectief",
+    lensSerial: "Serienummer objectief",
+    firmware: "Firmware",
+    taken: "Foto gemaakt",
+    owner: "Eigenaarsnaam in bestand",
+    readError: "Kon dit bestand niet lezen:",
+    unknownCamera: "Onbekende camera",
+  },
+  sv: {
+    name: "Svenska",
+    sub: "Slutarräknare, serienummer & utrustningsinfo direkt — rakt ur din bildfil.",
+    dropTitle: "Släpp en originalbild här",
+    dropHint: "(JPG eller CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) eller klicka för att välja.",
+    buyHint: "Köper du begagnat? Be säljaren om en oredigerad bild och släpp den här.",
+    privacy: "🔒 Allt körs lokalt i din webbläsare — din bild laddas aldrig upp.",
+    verdictNew: "Praktiskt taget ny slutare",
+    verdictLight: "Lätt använd — massor av liv kvar",
+    verdictUsed: "Väl använd — räkna in det i priset",
+    verdictHigh: "Högt slitage — slutaren närmar sig sin livslängd",
+    rating: "{pct} % av typisk livslängd på {life} exponeringar",
+    noCount: "Ingen slutarräknare i den här filen — modellen kanske inte sparar den (äldre Canon m.fl.), eller så är filen omexporterad. Kräver USB-avläsning.",
+    bodySerial: "Husets serienummer",
+    lens: "Objektiv",
+    lensSerial: "Objektivets serienummer",
+    firmware: "Firmware",
+    taken: "Bilden tagen",
+    owner: "Ägarnamn i filen",
+    readError: "Kunde inte läsa filen:",
+    unknownCamera: "Okänd kamera",
+  },
+  no: {
+    name: "Norsk",
+    sub: "Lukkerteller, serienummer og utstyrsinfo — rett fra bildefilen din.",
+    dropTitle: "Slipp et originalbilde her",
+    dropHint: "(JPG eller CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) eller klikk for å velge.",
+    buyHint: "Kjøper du brukt? Be selgeren om ett uredigert bilde og slipp det her.",
+    privacy: "🔒 Alt kjører lokalt i nettleseren din — bildet lastes aldri opp.",
+    verdictNew: "Praktisk talt ny lukker",
+    verdictLight: "Lite brukt — masse liv igjen",
+    verdictUsed: "Godt brukt — ta det med i prisen",
+    verdictHigh: "Høy slitasje — lukkeren nærmer seg sin levetid",
+    rating: "{pct} % av typisk levetid på {life} utløsninger",
+    noCount: "Ingen lukkerteller i denne filen — modellen lagrer den kanskje ikke (eldre Canon m.fl.), eller filen er re-eksportert. Krever USB-avlesning.",
+    bodySerial: "Husets serienummer",
+    lens: "Objektiv",
+    lensSerial: "Objektivets serienummer",
+    firmware: "Firmware",
+    taken: "Bilde tatt",
+    owner: "Eiernavn i filen",
+    readError: "Kunne ikke lese denne filen:",
+    unknownCamera: "Ukjent kamera",
+  },
+  fi: {
+    name: "Suomi",
+    sub: "Laukaisumäärä, sarjanumero ja kalustotiedot heti — suoraan kuvatiedostostasi.",
+    dropTitle: "Pudota alkuperäinen kuva tähän",
+    dropHint: "(JPG tai CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) tai valitse klikkaamalla.",
+    buyHint: "Ostamassa käytettyä? Pyydä myyjältä yksi muokkaamaton kuva ja pudota se tähän.",
+    privacy: "🔒 Kaikki toimii paikallisesti selaimessasi — kuvaasi ei koskaan lähetetä.",
+    verdictNew: "Käytännössä uusi suljin",
+    verdictLight: "Vähän käytetty — paljon elinikää jäljellä",
+    verdictUsed: "Runsaasti käytetty — huomioi hinnassa",
+    verdictHigh: "Kova kuluma — suljin lähestyy kestoikäänsä",
+    rating: "{pct} % tyypillisestä {life} laukaisun kestosta",
+    noCount: "Tiedostossa ei ole laukaisulaskuria — tämä malli ei ehkä tallenna sitä (vanhemmat Canonit ym.), tai tiedosto on viety uudelleen. Vaatii USB-luvun.",
+    bodySerial: "Rungon sarjanumero",
+    lens: "Objektiivi",
+    lensSerial: "Objektiivin sarjanumero",
+    firmware: "Laiteohjelmisto",
+    taken: "Kuva otettu",
+    owner: "Omistajan nimi tiedostossa",
+    readError: "Tiedostoa ei voitu lukea:",
+    unknownCamera: "Tuntematon kamera",
+  },
+  pl: {
+    name: "Polski",
+    sub: "Przebieg migawki, numer seryjny i informacje o sprzęcie — prosto z pliku zdjęcia.",
+    dropTitle: "Upuść tutaj oryginalne zdjęcie",
+    dropHint: "(JPG lub CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) albo kliknij, aby wybrać.",
+    buyHint: "Kupujesz używany sprzęt? Poproś sprzedawcę o jedno nieedytowane zdjęcie i upuść je tutaj.",
+    privacy: "🔒 Wszystko działa lokalnie w przeglądarce — zdjęcie nigdy nie jest wysyłane.",
+    verdictNew: "Migawka praktycznie nowa",
+    verdictLight: "Lekko używana — mnóstwo życia przed nią",
+    verdictUsed: "Mocno używana — uwzględnij w cenie",
+    verdictHigh: "Duże zużycie — migawka zbliża się do swojego resursu",
+    rating: "{pct}% typowego resursu {life} zwolnień",
+    noCount: "Brak licznika migawki w tym pliku — ten model może go nie zapisywać (starsze Canony i inne) lub plik został wyeksportowany ponownie. Wymagany odczyt przez USB.",
+    bodySerial: "Nr seryjny korpusu",
+    lens: "Obiektyw",
+    lensSerial: "Nr seryjny obiektywu",
+    firmware: "Firmware",
+    taken: "Zdjęcie wykonano",
+    owner: "Nazwa właściciela w pliku",
+    readError: "Nie udało się odczytać pliku:",
+    unknownCamera: "Nieznany aparat",
+  },
+  pt: {
+    name: "Português",
+    sub: "Contagem do obturador, número de série e informações do equipamento — direto do seu arquivo de foto.",
+    dropTitle: "Solte uma foto original aqui",
+    dropHint: "(JPG ou CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC) ou clique para escolher.",
+    buyHint: "Comprando usado? Peça ao vendedor uma foto sem edição e solte-a aqui.",
+    privacy: "🔒 Tudo roda localmente no seu navegador — sua foto nunca é enviada.",
+    verdictNew: "Obturador praticamente novo",
+    verdictLight: "Pouco usado — muita vida pela frente",
+    verdictUsed: "Bem usado — considere no preço",
+    verdictHigh: "Desgaste alto — obturador se aproximando do limite",
+    rating: "{pct}% da vida útil típica de {life} disparos",
+    noCount: "Sem contagem do obturador neste arquivo — este modelo pode não gravá-la (Canon antigas e outras), ou o arquivo foi reexportado. Necessária leitura via USB.",
+    bodySerial: "Nº de série do corpo",
+    lens: "Lente",
+    lensSerial: "Nº de série da lente",
+    firmware: "Firmware",
+    taken: "Foto tirada",
+    owner: "Nome do proprietário no arquivo",
+    readError: "Não foi possível ler este arquivo:",
+    unknownCamera: "Câmera desconhecida",
+  },
+  ja: {
+    name: "日本語",
+    sub: "シャッター回数・シリアル番号・機材情報を写真ファイルから即座に表示。",
+    dropTitle: "オリジナル写真をここにドロップ",
+    dropHint: "（JPG または CR3 · CR2 · NEF · ARW · RAF · PEF · HEIC）、クリックで選択もできます。",
+    buyHint: "中古購入なら：出品者に未編集の写真を1枚もらってここにドロップ。",
+    privacy: "🔒 すべてブラウザ内でローカル処理 — 写真はアップロードされません。",
+    verdictNew: "ほぼ新品のシャッター",
+    verdictLight: "使用少なめ — まだまだ長持ち",
+    verdictUsed: "使い込まれています — 価格交渉の材料に",
+    verdictHigh: "消耗大 — シャッター耐久回数に接近",
+    rating: "耐久目安 {life} 回の {pct}%",
+    noCount: "このファイルにはシャッター回数がありません — この機種は記録しない場合があります（旧型Canonなど）。または再書き出しされたファイルです。USB読み取りが必要です。",
+    bodySerial: "ボディシリアル",
+    lens: "レンズ",
+    lensSerial: "レンズシリアル",
+    firmware: "ファームウェア",
+    taken: "撮影日時",
+    owner: "ファイル内の所有者名",
+    readError: "ファイルを読み取れませんでした：",
+    unknownCamera: "不明なカメラ",
+  },
+};
+
+
+// Ekstra landingssides-nøgle (findes ikke i den delte i18n): "prøv nu"-overskrift
+const EXTRA = { en:"Try it now — free", da:"Prøv det nu — gratis", de:"Jetzt testen — kostenlos",
+  fr:"Essayez — gratuit", es:"Pruébalo — gratis", it:"Provalo — gratis", nl:"Probeer het — gratis",
+  sv:"Testa nu — gratis", no:"Prøv nå — gratis", fi:"Kokeile — ilmaiseksi", pl:"Wypróbuj — za darmo",
+  pt:"Experimente — grátis", ja:"今すぐ試す — 無料" };
+
+const RATINGS = [
+  [/EOS-1D|D6\b|D5\b|Z ?9|A1\b|A9\b/i, 500000],
+  [/5D|R5|R3|D850|D810|Z ?8|A7R|X-H/i, 300000],
+  [/6D|R6|R8|RP|90D|D750|D780|Z ?6|Z ?7|A7\b|X-T/i, 200000],
+  [/.*/, 150000],
+];
+const ratedLife = (m) => RATINGS.find(([re]) => re.test(m))[1];
+
+let lang = localStorage.getItem("gearscope-lang")
+  || (navigator.languages || [navigator.language || "en"])
+       .map((l) => l.toLowerCase().split("-")[0]).find((l) => I18N[l])
+  || "en";
+const t = (key, vars) => {
+  let s = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+  if (vars) for (const [k, v] of Object.entries(vars)) s = s.replace("{" + k + "}", v);
+  return s;
+};
+
+const langSel = document.getElementById("lang");
+for (const [code, dict] of Object.entries(I18N)) {
+  const opt = document.createElement("option");
+  opt.value = code; opt.textContent = dict.name;
+  if (code === lang) opt.selected = true;
+  langSel.appendChild(opt);
+}
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((el) => {
+    el.textContent = el.dataset.t === "tryTitle" ? (EXTRA[lang] || EXTRA.en) : t(el.dataset.t);
+  });
+}
+langSel.addEventListener("change", () => {
+  lang = langSel.value;
+  localStorage.setItem("gearscope-lang", lang);
+  applyLang();
+});
+applyLang();
+
+const drop = document.getElementById("drop");
+const input = document.getElementById("file");
+const out = document.getElementById("out");
+
+drop.addEventListener("click", () => input.click());
+input.addEventListener("change", () => handle([...input.files]));
+drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("hover"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("hover"));
+drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("hover"); handle([...e.dataTransfer.files]); });
+
+const escHtml = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+async function handle(files) {
+  for (const f of files) {
+    const card = document.createElement("div");
+    card.className = "result";
+    try {
+      const bytes = new Uint8Array(await f.arrayBuffer());
+      const m = extractGearMetadata(bytes);
+      let shutterHtml;
+      if (m.shutterCount != null) {
+        const life = ratedLife(m.model || "");
+        const pct = (m.shutterCount / life) * 100;
+        const verdict = pct < 10 ? ["verdictNew", "good"]
+          : pct < 40 ? ["verdictLight", "good"]
+          : pct < 75 ? ["verdictUsed", "warn"]
+          : ["verdictHigh", "warn"];
+        shutterHtml = '<div class="big">' + m.shutterCount.toLocaleString(lang) + '</div>' +
+          '<div class="verdict ' + verdict[1] + '">' + t(verdict[0]) + " — " +
+          t("rating", { pct: pct.toFixed(1), life: life.toLocaleString(lang) }) + "</div>" +
+          '<div class="bar"><div style="width:' + Math.max(1, Math.min(100, pct)) + '%"></div></div>';
+      } else {
+        shutterHtml = '<div class="err">' + t("noCount") + "</div>";
+      }
+      const row = (key, val) => (val ? "<tr><td>" + t(key) + "</td><td>" + escHtml(val) + "</td></tr>" : "");
+      card.innerHTML = "<h3>" + escHtml(m.model || t("unknownCamera")) +
+        " <span style='color:var(--dim);font-weight:400'>· " + escHtml(f.name) + "</span></h3>" +
+        shutterHtml + "<table>" +
+        row("bodySerial", m.serialNumber) +
+        row("lens", m.lensModel) +
+        row("lensSerial", m.lensSerialNumber) +
+        row("firmware", m.firmware && m.firmware.replace(/^Firmware Version /, "")) +
+        row("taken", m.dateTimeOriginal) +
+        row("owner", m.ownerName) +
+        "</table>";
+    } catch (e) {
+      card.innerHTML = "<h3>" + escHtml(f.name) + '</h3><div class="err">' + t("readError") + " " + escHtml(e.message || e) + "</div>";
+    }
+    out.prepend(card);
+  }
+}
+</script></body></html>
